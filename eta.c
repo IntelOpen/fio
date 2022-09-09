@@ -12,6 +12,13 @@
 
 #include "fio.h"
 #include "lib/pow2.h"
+#include <time.h>
+void timestamp()
+{
+    time_t ltime; /* calendar time */
+    ltime=time(NULL); /* get current cal time */
+    printf("%s",asctime( localtime(&ltime) ) );
+}
 
 static char __run_str[REAL_MAX_JOBS + 1];
 static char run_str[__THREAD_RUNSTR_SZ(REAL_MAX_JOBS) + 1];
@@ -649,7 +656,11 @@ void display_thread_status(struct jobs_eta *je)
 		left = sizeof(output) - (p - output) - 1;
 		l = snprintf(p, left, ": [%s][%s]", je->run_str, perc_str);
 		l += gen_eta_str(je, p + l, left - l, rate_str, iops_str);
-		l += snprintf(p + l, left - l, "[eta %s]", eta_str);
+		
+		time_t now = time(NULL);
+		char * time = asctime(gmtime(&now));
+    	time[strlen(time)-1] = '\0';    
+		l += snprintf(p + l, left - l, "[eta %s][time %s][timestamp %ld]", eta_str, time, now);
 
 		/* If truncation occurred adjust l so p is on the null */
 		if (l >= left)
